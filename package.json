@@ -43,5 +43,8 @@
   },
   "refine": {
     "projectId": "SCNPhj-cQ41OW-W39tR8"
+  },
+  "volta": {
+    "node": "21.7.1"
   }
 }
