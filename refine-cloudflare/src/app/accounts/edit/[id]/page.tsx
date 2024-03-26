@@ -10,8 +10,19 @@ export default function CategoryEdit() {
     <Edit saveButtonProps={saveButtonProps}>
       <Form {...formProps} layout="vertical">
         <Form.Item
-          label={"Title"}
-          name={["title"]}
+          label={"Balance"}
+          name={["balance"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={"NFC ID"}
+          name={["nfc-id"]}
           rules={[
             {
               required: true,

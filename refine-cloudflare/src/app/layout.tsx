@@ -37,49 +37,43 @@ export default function RootLayout({
           <RefineKbarProvider>
             <AntdRegistry>
               <ColorModeContextProvider defaultMode={defaultMode}>
-                <DevtoolsProvider>
-                  <Refine
-                    routerProvider={routerProvider}
-                    dataProvider={dataProvider}
-                    liveProvider={liveProvider}
-                    authProvider={authProvider}
-                    notificationProvider={useNotificationProvider}
-                    resources={[
-                      {
-                        name: "660270358d5a10efebf5", // resource ID
-                        list: "/accounts",
-                        create: "/accounts/create",
-                        edit: "/accounts/edit/:id",
-                        show: "/accounts/show/:id",
-                        meta: {
-                          canDelete: true,
-                          label: "Accounts", // https://refine.dev/docs/core/refine-component/#label
-                        },
+                <Refine
+                  routerProvider={routerProvider}
+                  dataProvider={dataProvider}
+                  liveProvider={liveProvider}
+                  authProvider={authProvider}
+                  notificationProvider={useNotificationProvider}
+                  resources={[
+                    {
+                      name: "660270358d5a10efebf5", // resource ID
+                      list: "/accounts",
+                      create: "/accounts/create",
+                      edit: "/accounts/edit/:id",
+                      meta: {
+                        canDelete: true,
+                        label: "Accounts", // https://refine.dev/docs/core/refine-component/#label
                       },
-                      {
-                        name: "6602717c258ab09ec073", // resource ID
-                        list: "/transactions",
-                        create: "/transactions/create",
-                        edit: "/transactions/edit/:id",
-                        show: "/transactions/show/:id",
-                        meta: {
-                          canDelete: true,
-                          label: "Transactions", // https://refine.dev/docs/core/refine-component/#label
-                        },
+                    },
+                    {
+                      name: "6602717c258ab09ec073", // resource ID
+                      list: "/transactions",
+                      meta: {
+                        canDelete: true,
+                        label: "Transactions", // https://refine.dev/docs/core/refine-component/#label
                       },
-                    ]}
-                    options={{
-                      syncWithLocation: true,
-                      warnWhenUnsavedChanges: true,
-                      useNewQueryKeys: true,
-                      projectId: "SCNPhj-cQ41OW-W39tR8",
-                      liveMode: "auto",
-                    }}
-                  >
-                    {children}
-                    <RefineKbar />
-                  </Refine>
-                </DevtoolsProvider>
+                    },
+                  ]}
+                  options={{
+                    syncWithLocation: true,
+                    warnWhenUnsavedChanges: true,
+                    useNewQueryKeys: true,
+                    projectId: "SCNPhj-cQ41OW-W39tR8",
+                    liveMode: "auto",
+                  }}
+                >
+                  {children}
+                  <RefineKbar />
+                </Refine>
               </ColorModeContextProvider>
             </AntdRegistry>
           </RefineKbarProvider>
