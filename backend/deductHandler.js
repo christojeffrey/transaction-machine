@@ -20,9 +20,9 @@ async function deductHandler(ownerNfcId, amount) {
     let owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
 
     // deduct the amount from the owner
-    await databases.updateDocument(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID, owner.$id, {
-      balance: owner.balance + amount,
-    });
+    // await databases.updateDocument(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID, owner.$id, {
+    //   balance: owner.balance + amount,
+    // });
 
     // record transaction
     respond = await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
