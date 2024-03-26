@@ -27,7 +27,7 @@ async function deductHandler(ownerNfcId, amount) {
             balance: owner.balance + amount,
           });
         } else {
-          respond = await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
+          await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
             amount: amount,
             account: owner.$id,
           });
@@ -41,7 +41,7 @@ async function deductHandler(ownerNfcId, amount) {
   } catch (e) {
     respond = "error! " + e.message;
   }
-  return respond;
+  return `your balance is now: ${owner.balance + amount}`;
 }
 
 exports.deductHandler = deductHandler;
