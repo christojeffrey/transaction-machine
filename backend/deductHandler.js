@@ -15,20 +15,29 @@ async function deductHandler(ownerNfcId, amount) {
   let respond;
   try {
     // get the owner
-    // const accounts = await databases.listDocuments(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID);
+    const accounts = await databases.listDocuments(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID);
 
-    // let owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
+    let owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
+
+    await Promise.all(
+      // this is a way to run async functions in parallel
+      [1, 2].map(async (number) => {
+        if (number === 1) {
+          await databases.updateDocument(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID, owner.$id, {
+            balance: owner.balance + amount,
+          });
+        } else {
+          respond = await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
+            amount: amount,
+            account: owner.$id,
+          });
+        }
+      })
+    );
 
     // deduct the amount from the owner
-    // await databases.updateDocument(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID, owner.$id, {
-    //   balance: owner.balance + amount,
-    // });
 
     // record transaction
-    respond = await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
-      amount: amount,
-      //   account: owner.$id,
-    });
   } catch (e) {
     respond = "error! " + e.message;
   }
