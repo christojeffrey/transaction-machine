@@ -26,27 +26,27 @@ export default function CategoryCreate() {
   );
 }
 
-function ScanNFCButton() {
-  const handleClick = async () => {
-    if ("NDEFReader" in window) {
-      try {
-        const ndef = new window.NDEFReader();
-        await ndef.scan();
+// function ScanNFCButton() {
+//   const handleClick = async () => {
+//     if ("NDEFReader" in window) {
+//       try {
+//         const ndef = new window.NDEFReader();
+//         await ndef.scan();
 
-        console.log("Scan started successfully.");
-        ndef.onreadingerror = () => {
-          console.log("Cannot read data from the NFC tag. Try another one?");
-        };
+//         console.log("Scan started successfully.");
+//         ndef.onreadingerror = () => {
+//           console.log("Cannot read data from the NFC tag. Try another one?");
+//         };
 
-        ndef.onreading = (event: any) => {
-          console.log("NDEF message read.");
-        };
-      } catch (error) {
-        console.log(`Error! Scan failed to start: ${error}.`);
-      }
-    } else {
-      console.log("NDEFReader not supported.");
-    }
-  };
-  return <Button onClick={handleClick}>Scan NFC</Button>;
-}
+//         ndef.onreading = (event: any) => {
+//           console.log("NDEF message read.");
+//         };
+//       } catch (error) {
+//         console.log(`Error! Scan failed to start: ${error}.`);
+//       }
+//     } else {
+//       console.log("NDEFReader not supported.");
+//     }
+//   };
+//   return <Button onClick={handleClick}>Scan NFC</Button>;
+// }
