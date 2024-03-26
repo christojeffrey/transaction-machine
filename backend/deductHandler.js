@@ -1,5 +1,6 @@
+const sdk = require("node-appwrite");
+
 function getDatabases() {
-  const sdk = require("node-appwrite");
   let client = new sdk.Client();
   client
     .setEndpoint(process.env.PROJECT_API_ENDPOINT) // Your API Endpoint
