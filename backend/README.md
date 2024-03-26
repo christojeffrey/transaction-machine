@@ -6,6 +6,6 @@
 npm i
 ```
 
-2. run `node index.js`
+2. run `node main.js`
 
 created using appwrite database, express, and deployed in vercel

@@ -1,4 +1,4 @@
-const { deductHandler } = require("./deductHandler");
+const { deductHandler } = require("../deductHandler");
 
 export async function POST(req, res) {
   if (req.headers.authorization !== process.env.AUTHORIZATION) {
