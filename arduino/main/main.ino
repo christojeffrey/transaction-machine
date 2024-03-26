@@ -9,11 +9,22 @@
 
 #include <WiFiClientSecure.h>
 
-const char* ssid = "asfasdf";
-const char* password = "asfdasfsdaf";
+const char* ssid = "asfdasdf";
+const char* password = "asfdsdf";
 
 const char*  server = "transaction-machine.vercel.app";  // Server URL
 
+#define NO_TRANSACTION 1
+#define TRANSACTION_SUCCESS 2
+#define TRANSACTION_FAILED 3
+
+const int frequency = 10;
+const int duration = 5000; // in milliseconds
+
+unsigned long lastTransactionTime;
+
+float timeBetweenPulses = 1000 / frequency; // in milliseconds
+int transactionState = NO_TRANSACTION;
 #define LED_BUILTIN 2
 WiFiClientSecure client;
 
@@ -68,6 +79,21 @@ void sendRequest(String nfcId, int amount){
     while (client.available()) {
         String line = client.readStringUntil('\n');
         Serial.println(line);
+
+        // check line 
+        if(line.indexOf("BERHASIL") > 0){
+          // transaction success
+          Serial.println("Transaction success");
+          transactionState = TRANSACTION_SUCCESS;
+          lastTransactionTime = millis();
+          return;
+        } else if(line.indexOf("TIDAK") > 0){
+          // transaction failed
+          Serial.println("Transaction failed");
+          transactionState = TRANSACTION_FAILED;
+          lastTransactionTime = millis();
+          return;
+        }
     }
 
     Serial.println("\nClosing connection");
@@ -79,10 +105,11 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
   delay(100);
-  setupPin();
 
   connectToWifi();
+  setupPin();
   
+  // example
   sendRequest("1234", 100);
   
 }
@@ -92,6 +119,44 @@ void setupPin(){
   digitalWrite(LED_BUILTIN, LOW);
 }
 
+
+
 void loop() {
-  // do nothing
+  if(transactionState == TRANSACTION_FAILED){
+    // blink LED
+    blinkLed();
+    checkIfDurationHasPassed();
+
+  }else if(transactionState == TRANSACTION_SUCCESS){
+    // keep LED on
+    digitalWrite(LED_BUILTIN, HIGH);
+    checkIfDurationHasPassed();
+  }
+}
+
+
+void checkIfDurationHasPassed(){
+  // check if <duration> amount of time has passed
+  unsigned long currentTime = millis();
+
+  if(transactionState == TRANSACTION_SUCCESS || transactionState == TRANSACTION_FAILED){
+    Serial.println("Checking if duration has passed...");
+    if (currentTime - lastTransactionTime >= duration) {
+      // turn of LED
+      digitalWrite(LED_BUILTIN, LOW);
+      transactionState = NO_TRANSACTION;
+      Serial.println("Duration has passed, turning off LED");
+    }
+  }
+}
+
+unsigned long timeLastChangeInLedState = millis(); // in milliseconds
+void blinkLed(){
+// run LED based on frequency
+  unsigned long currentTime = millis();
+  if (currentTime - timeLastChangeInLedState >= timeBetweenPulses) {
+    timeLastChangeInLedState = currentTime;
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+
+  }
 }
