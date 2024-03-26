@@ -47,13 +47,14 @@ export default function RootLayout({
                     notificationProvider={useNotificationProvider}
                     resources={[
                       {
-                        name: "660270358d5a10efebf5",
-                        list: "/categories",
-                        create: "/categories/create",
-                        edit: "/categories/edit/:id",
-                        show: "/categories/show/:id",
+                        name: "660270358d5a10efebf5", // resource ID
+                        list: "/accounts",
+                        create: "/accounts/create",
+                        edit: "/accounts/edit/:id",
+                        show: "/accounts/show/:id",
                         meta: {
                           canDelete: true,
+                          label: "Accounts", // https://refine.dev/docs/core/refine-component/#label
                         },
                       },
                     ]}

@@ -30,9 +30,9 @@ const storage = new Storage(appwriteClient);
 export { account, appwriteClient, storage };
 
 export const dataProvider = appwriteDataProvider(appwriteClient, {
-  databaseId: "database",
+  databaseId: "6602701d11a3e9a70125",
 });
 
 export const liveProvider = appwriteLiveProvider(appwriteClient, {
-  databaseId: "database",
+  databaseId: "6602701d11a3e9a70125",
 });

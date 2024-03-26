@@ -12,7 +12,8 @@ export default function CategoryList() {
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="balance" title={"balance"} />
+        <Table.Column dataIndex="balance" title={"Balance"} />
+        <Table.Column dataIndex="nfc-id" title={"NFC ID"} />
         <Table.Column
           title={"Actions"}
           dataIndex="actions"
