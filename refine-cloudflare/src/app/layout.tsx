@@ -34,7 +34,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Suspense>
-          <GitHubBanner />
           <RefineKbarProvider>
             <AntdRegistry>
               <ColorModeContextProvider defaultMode={defaultMode}>
@@ -55,6 +54,17 @@ export default function RootLayout({
                         meta: {
                           canDelete: true,
                           label: "Accounts", // https://refine.dev/docs/core/refine-component/#label
+                        },
+                      },
+                      {
+                        name: "6602717c258ab09ec073", // resource ID
+                        list: "/transactions",
+                        create: "/transactions/create",
+                        edit: "/transactions/edit/:id",
+                        show: "/transactions/show/:id",
+                        meta: {
+                          canDelete: true,
+                          label: "Transactions", // https://refine.dev/docs/core/refine-component/#label
                         },
                       },
                     ]}

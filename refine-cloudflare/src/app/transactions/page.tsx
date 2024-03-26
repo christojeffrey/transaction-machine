@@ -8,12 +8,18 @@ export default function CategoryList() {
   const { tableProps } = useTable({
     syncWithLocation: true,
   });
-
+  console.log(tableProps);
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="balance" title={"Balance"} />
-        <Table.Column dataIndex="nfc-id" title={"NFC ID"} />
+        <Table.Column
+          dataIndex={`account`}
+          title={"NFC ID"}
+          render={(value) => {
+            return value ? value["nfc-id"] : "no id";
+          }}
+        />
+        <Table.Column dataIndex="amount" title={"amount"} />
         <Table.Column dataIndex="$createdAt" title={"Created At"} />
         <Table.Column
           title={"Actions"}
