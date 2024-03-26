@@ -3,7 +3,8 @@ function getDatabases() {
   let client = new sdk.Client();
   client
     .setEndpoint(process.env.PROJECT_API_ENDPOINT) // Your API Endpoint
-    .setProject(process.env.PROJECT_ID); // Your project ID
+    .setProject(process.env.PROJECT_ID) // Your project ID
+    .setKey(process.env.DATABASE_API_KEY);
 
   const databases = new sdk.Databases(client);
   return databases;
