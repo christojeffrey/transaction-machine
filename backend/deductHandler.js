@@ -21,7 +21,7 @@ async function deductHandler(ownerNfcId, amount) {
     owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
 
     // check remaining balance
-    if (owner.balance < amount) {
+    if (owner.balance + amount < 0) {
       return "SALDO TIDAK MENCUKUPI";
     }
 
