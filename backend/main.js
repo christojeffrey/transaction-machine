@@ -25,6 +25,8 @@ app.post("/api/deduct", async (req, res) => {
     res.status(400).send("nfcId and amount are required");
     return;
   }
+  // parse amount to number
+  amount = parseInt(amount);
 
   let respond = await deductHandler(ownerNfcId, amount);
   res.send(respond);

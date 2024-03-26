@@ -20,6 +20,11 @@ async function deductHandler(ownerNfcId, amount) {
 
     owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
 
+    // check remaining balance
+    if (owner.balance < amount) {
+      return "SALDO TIDAK MENCUKUPI";
+    }
+
     await Promise.all(
       // this is a way to run async functions in parallel
       [1, 2].map(async (number) => {
@@ -42,7 +47,7 @@ async function deductHandler(ownerNfcId, amount) {
   } catch (e) {
     respond = "error! " + e.message;
   }
-  return `your balance is now: ${owner.balance + amount}`;
+  return `TRANSAKSI BERHASIL, SISA SALDO Rp. ${owner.balance + amount}`;
 }
 
 exports.deductHandler = deductHandler;

@@ -16,6 +16,7 @@ export async function POST(req, res) {
   if (!ownerNfcId || !amount) {
     return new Response("nfcId and amount are required", { status: 400 });
   }
+  amount = parseInt(amount);
 
   let respond = await deductHandler(ownerNfcId, amount);
   return new Response(JSON.stringify(respond));

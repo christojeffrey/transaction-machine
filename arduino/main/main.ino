@@ -9,12 +9,12 @@
 
 #include <WiFiClientSecure.h>
 
-const char* ssid = "63prknykn lt.2";
-const char* password = "Knykn063";
+const char* ssid = "asfasdf";
+const char* password = "asfdasfsdaf";
 
 const char*  server = "transaction-machine.vercel.app";  // Server URL
 
-
+#define LED_BUILTIN 2
 WiFiClientSecure client;
 
 void connectToWifi(){
@@ -32,14 +32,8 @@ void connectToWifi(){
   Serial.print("Connected to ");
   Serial.println(ssid);
 }
-void setup() {
-  //Initialize serial and wait for port to open:
-  Serial.begin(115200);
-  delay(100);
 
-  connectToWifi();
-
-  
+void sendRequest(String nfcId, int amount){
   // TODO: make this secure!
   client.setInsecure();
 
@@ -52,6 +46,11 @@ void setup() {
     client.println("POST https://transaction-machine.vercel.app/api/deduct HTTP/1.0");
     client.println("Content-Type: application/json");
     client.println("Authorization: secrete");
+    String body = String("{\"nfcId\": \"" + nfcId + "\", \"amount\": " + String(amount) + "}");
+    client.println("Content-Length: " + String(body.length()));
+    client.println();
+    client.println(body);
+    client.println();
     client.println("Host: transaction-machine.vercel.app");
     client.println("Connection: close");
     client.println();
@@ -63,15 +62,34 @@ void setup() {
         break;
       }
     }
+
     // if there are incoming bytes available
     // from the server, read them and print them:
     while (client.available()) {
-      char c = client.read();
-      Serial.write(c);
+        String line = client.readStringUntil('\n');
+        Serial.println(line);
     }
+
     Serial.println("\nClosing connection");
     client.stop();
   }
+}
+
+void setup() {
+  //Initialize serial and wait for port to open:
+  Serial.begin(115200);
+  delay(100);
+  setupPin();
+
+  connectToWifi();
+  
+  sendRequest("1234", 100);
+  
+}
+
+void setupPin(){
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
