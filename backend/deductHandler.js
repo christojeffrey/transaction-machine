@@ -13,11 +13,12 @@ function getDatabases() {
 async function deductHandler(ownerNfcId, amount) {
   const databases = getDatabases();
   let respond;
+  let owner;
   try {
     // get the owner
     const accounts = await databases.listDocuments(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID);
 
-    let owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
+    owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
 
     await Promise.all(
       // this is a way to run async functions in parallel
