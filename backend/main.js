@@ -7,11 +7,11 @@ require("dotenv").config({ path: "./.env" });
 app.use(bodyParser.json());
 
 const { deductHandler } = require("./deductHandler");
-app.get("/", async (req, res) => {
+app.get("/api", async (req, res) => {
   res.send("hello world!");
 });
 
-app.post("/deduct", async (req, res) => {
+app.post("/api/deduct", async (req, res) => {
   //   validate authorization
   if (req.headers.authorization !== process.env.AUTHORIZATION) {
     res.status(401).send("Unauthorized");
