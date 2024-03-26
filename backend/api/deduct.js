@@ -4,7 +4,12 @@ export async function POST(req, res) {
   if (req.headers.get("authorization") !== process.env.AUTHORIZATION) {
     return new Response("Unauthorized", { status: 401 });
   }
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (e) {
+    return new Response("error! Invalid JSON", { status: 400 });
+  }
   let ownerNfcId = body.nfcId;
   let amount = body.amount;
   //   validate
