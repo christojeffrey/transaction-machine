@@ -21,7 +21,7 @@ async function deductHandler(ownerNfcId, amount) {
     owner = accounts.documents.find((account) => account["nfc-id"] === ownerNfcId);
 
     if (!owner) {
-      return `user dengan nfc-id ${ownerNfcId} tidak ditemukan. daftar dahulu ke admin`;
+      return `TAG ${ownerNfcId} TIDAK DITEMUKAN. DAFTARKAN DAHULU KARTU ANDA`;
     }
 
     // check remaining balance
