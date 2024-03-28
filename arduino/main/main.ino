@@ -19,8 +19,7 @@ const char*  server = "transaction-machine.vercel.app";  // Server URL
 #define TRANSACTION_FAILED 3
 
 const int frequency = 10;
-const int duration = 5000; // in milliseconds
-
+const int duration = 5000; // in milliseconds. for light blinking or solid when transaction success or failed. this will also be the delay for the next transaction. 
 unsigned long lastTransactionTime;
 
 float timeBetweenPulses = 1000 / frequency; // in milliseconds
@@ -28,6 +27,7 @@ int transactionState = NO_TRANSACTION;
 #define LED_BUILTIN 2
 WiFiClientSecure client;
 
+int transactionAmount = 100;
 
 #include <SPI.h>
 #include <MFRC522.h>
@@ -68,10 +68,14 @@ void sendRequest(String nfcId, int amount){
   client.setInsecure();
 
   Serial.println("\nStarting connection to server...");
-  if (!client.connect(server, 443))
+  appendToDisplay("Sending request...\n");
+  if (!client.connect(server, 443)){
     Serial.println("Connection failed!");
+    appendToDisplay("Connection failed!\n");
+  }
   else {
     Serial.println("Connected to server!");
+    appendToDisplay("Connected to server!\n");
     // Make a HTTP request:
     client.println("POST https://transaction-machine.vercel.app/api/deduct HTTP/1.0");
     client.println("Content-Type: application/json");
@@ -96,26 +100,28 @@ void sendRequest(String nfcId, int amount){
     // if there are incoming bytes available
     // from the server, read them and print them:
     while (client.available()) {
-        String line = client.readStringUntil('\n');
-        Serial.println(line);
+        String respond = client.readStringUntil('\n');
+        Serial.println(respond);
+
+        char respondChar[respond.length() + 1];
+        respond.toCharArray(respondChar, respond.length() + 1);
+        printToDisplay(respondChar);
 
         // check line 
-        if(line.indexOf("BERHASIL") > 0){
+        if(respond.indexOf("BERHASIL") > 0){
           // transaction success
-          Serial.println("Transaction success");
           transactionState = TRANSACTION_SUCCESS;
           lastTransactionTime = millis();
           return;
-        } else if(line.indexOf("TIDAK") > 0){
-          // transaction failed
-          Serial.println("Transaction failed");
+        } else if(respond.indexOf("TIDAK") > 0){ 
+          // transaction failed or card not registered
           transactionState = TRANSACTION_FAILED;
           lastTransactionTime = millis();
           return;
         }
     }
-
     Serial.println("\nClosing connection");
+    appendToDisplay("Closing connection\n");
     client.stop();
   }
 }
@@ -128,8 +134,8 @@ void setup() {
   connectToWifi();
   setupLed();
   
-  // example
-  sendRequest("1234", 100);
+  // // example
+  // sendRequest("1234", 100);
 
   setupDisplay();
   setupNFCReader();
@@ -158,6 +164,12 @@ void appendToDisplay(char *text){
   display.display();
 }
 
+void clearDisplay(){
+  display.clearDisplay();
+  display.setCursor(0, 10);
+  display.display();
+}
+
 void printToDisplay(char *text){
   display.clearDisplay();
   display.setCursor(0, 10);
@@ -177,24 +189,27 @@ void standByNFCRead(){
   if (rfid.PICC_IsNewCardPresent()) { // new tag is available
     if (rfid.PICC_ReadCardSerial()) { // NUID has been readed
       MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
-      Serial.print("RFID/NFC Tag Type: ");
-      Serial.println(rfid.PICC_GetTypeName(piccType));
       
 
       // print UID in Serial Monitor in the hex format
-      Serial.print("UID:");
-      Serial.println("uid size = " + String(rfid.uid.size));
 
-      char uidString[20];
+      char uid[20];
       for (int i = 0; i < rfid.uid.size; i++) {
-        Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
-        Serial.print(rfid.uid.uidByte[i], HEX);
-        sprintf(uidString, "%s%02X", uidString, rfid.uid.uidByte[i]);
+        if(rfid.uid.uidByte[i] < 0x10){
+          sprintf(uid, "%s0%X", uid, rfid.uid.uidByte[i]);
+          Serial.print("0");
+          Serial.print(rfid.uid.uidByte[i], HEX);
+        } else{
+          sprintf(uid, "%s%X", uid, rfid.uid.uidByte[i]);
+          Serial.print(rfid.uid.uidByte[i], HEX);
+        }
       }
-      Serial.println();
-      printToDisplay("NFC TAG \n UID");
-      appendToDisplay(uidString);
-      sendRequest("1234", 1000);
+      appendToDisplay("TAG UID: ");
+      appendToDisplay(uid);
+      Serial.println(uid);
+      appendToDisplay("\n");
+
+      sendRequest(uid, transactionAmount);
 
       rfid.PICC_HaltA(); // halt PICC
       rfid.PCD_StopCrypto1(); // stop encryption on PCD
@@ -214,6 +229,7 @@ void loop() {
     checkIfDurationHasPassed();
   } else{ // no transaction is currently running
     // ready for transaction.
+    printToDisplay("Ready for transaction\n");
     standByNFCRead();
   }
 }
