@@ -9,8 +9,8 @@
 
 #include <WiFiClientSecure.h>
 
-const char* ssid = "asfdasdf";
-const char* password = "asfdsdf";
+const char* ssid = "63prknykn lt.2";
+const char* password = "Knykn063";
 
 const char*  server = "transaction-machine.vercel.app";  // Server URL
 
@@ -27,6 +27,25 @@ float timeBetweenPulses = 1000 / frequency; // in milliseconds
 int transactionState = NO_TRANSACTION;
 #define LED_BUILTIN 2
 WiFiClientSecure client;
+
+
+#include <SPI.h>
+#include <MFRC522.h>
+
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SS_PIN  5  // ESP32 pin GPIO5 
+#define RST_PIN 4 // ESP32 pin GPIO27 
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+MFRC522 rfid(SS_PIN, RST_PIN);
 
 void connectToWifi(){
   Serial.print("Attempting to connect to SSID: ");
@@ -107,19 +126,81 @@ void setup() {
   delay(100);
 
   connectToWifi();
-  setupPin();
+  setupLed();
   
   // example
   sendRequest("1234", 100);
-  
+
+  setupDisplay();
+  setupNFCReader();
 }
 
-void setupPin(){
+void setupLed(){
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 }
 
+void setupDisplay(){
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
+      Serial.println(F("SSD1306 allocation failed"));
+      for(;;);
+  }
+  delay(2000);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  printToDisplay("display ready!\n");
+}
 
+void appendToDisplay(char *text){
+  display.print(text);
+  display.display();
+}
+
+void printToDisplay(char *text){
+  display.clearDisplay();
+  display.setCursor(0, 10);
+  
+  // Display static text
+  display.print(text);
+  display.display();
+}
+
+void setupNFCReader(){
+  SPI.begin(); // init SPI bus
+  rfid.PCD_Init(); // init MFRC522
+  Serial.println("NFC Reader Ready");
+}
+
+void standByNFCRead(){
+  if (rfid.PICC_IsNewCardPresent()) { // new tag is available
+    if (rfid.PICC_ReadCardSerial()) { // NUID has been readed
+      MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
+      Serial.print("RFID/NFC Tag Type: ");
+      Serial.println(rfid.PICC_GetTypeName(piccType));
+      
+
+      // print UID in Serial Monitor in the hex format
+      Serial.print("UID:");
+      Serial.println("uid size = " + String(rfid.uid.size));
+
+      char uidString[20];
+      for (int i = 0; i < rfid.uid.size; i++) {
+        Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+        Serial.print(rfid.uid.uidByte[i], HEX);
+        sprintf(uidString, "%s%02X", uidString, rfid.uid.uidByte[i]);
+      }
+      Serial.println();
+      printToDisplay("NFC TAG \n UID");
+      appendToDisplay(uidString);
+      sendRequest("1234", 1000);
+
+      rfid.PICC_HaltA(); // halt PICC
+      rfid.PCD_StopCrypto1(); // stop encryption on PCD
+    }
+  }
+}
 
 void loop() {
   if(transactionState == TRANSACTION_FAILED){
@@ -131,6 +212,9 @@ void loop() {
     // keep LED on
     digitalWrite(LED_BUILTIN, HIGH);
     checkIfDurationHasPassed();
+  } else{ // no transaction is currently running
+    // ready for transaction.
+    standByNFCRead();
   }
 }
 
@@ -140,7 +224,7 @@ void checkIfDurationHasPassed(){
   unsigned long currentTime = millis();
 
   if(transactionState == TRANSACTION_SUCCESS || transactionState == TRANSACTION_FAILED){
-    Serial.println("Checking if duration has passed...");
+    // Serial.println("Checking if duration has passed...");
     if (currentTime - lastTransactionTime >= duration) {
       // turn of LED
       digitalWrite(LED_BUILTIN, LOW);
