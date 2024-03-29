@@ -9,6 +9,17 @@ import { v4 as uuidv4 } from "uuid";
 
 export const authProvider: AuthBindings = {
   login: async ({ email, password }) => {
+    // force logout first
+    try {
+      await account.deleteSession("current");
+    } catch (error: any) {
+      return {
+        success: false,
+        error,
+      };
+    }
+    Cookies.remove(APPWRITE_TOKEN_KEY, { path: "/" });
+    appwriteClient.setJWT("");
     try {
       await account.createEmailSession(email, password);
       const { jwt } = await account.createJWT();
