@@ -20,6 +20,13 @@ export default function CategoryList() {
           }}
         />
         <Table.Column dataIndex="amount" title={"amount"} />
+        <Table.Column
+          dataIndex="success"
+          title={"success"}
+          render={(value) => {
+            return value ? "success" : "failed";
+          }}
+        />
         <Table.Column dataIndex="$createdAt" title={"Created At"} />
         <Table.Column
           title={"Actions"}
