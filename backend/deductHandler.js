@@ -26,6 +26,12 @@ async function deductHandler(ownerNfcId, amount) {
 
     // check remaining balance
     if (owner.balance + amount < 0) {
+      // log transaction
+      await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
+        amount: amount,
+        account: owner.$id,
+        success: false,
+      });
       return "SALDO TIDAK MENCUKUPI";
     }
 
@@ -33,13 +39,16 @@ async function deductHandler(ownerNfcId, amount) {
       // this is a way to run async functions in parallel
       [1, 2].map(async (number) => {
         if (number === 1) {
+          // update balance
           await databases.updateDocument(process.env.DATABASE_ID, process.env.ACCOUNT_COLLECTION_ID, owner.$id, {
             balance: owner.balance + amount,
           });
         } else {
+          // log transaction
           await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
             amount: amount,
             account: owner.$id,
+            success: true,
           });
         }
       })
