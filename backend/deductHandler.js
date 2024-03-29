@@ -30,6 +30,7 @@ async function deductHandler(ownerNfcId, amount) {
       await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
         amount: amount,
         account: owner.$id,
+        updatedBalance: owner.balance,
         success: false,
       });
       return "SALDO TIDAK MENCUKUPI";
@@ -48,6 +49,7 @@ async function deductHandler(ownerNfcId, amount) {
           await databases.createDocument(process.env.DATABASE_ID, process.env.TRANSACTION_COLLECTION_ID, sdk.ID.unique(), {
             amount: amount,
             account: owner.$id,
+            updatedBalance: owner.balance + amount,
             success: true,
           });
         }
